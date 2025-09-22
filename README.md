@@ -106,10 +106,11 @@ The application will be available at:
 
 1. **Setup Environment**
 ```bash
-# Copy Docker environment file
-cp .env.docker.example .env
+# Copy environment file
+cp .env.example .env
 
 # Edit .env and add your ElevenLabs API key
+# Example: ELEVENLABS_API_KEY=sk_your_actual_api_key_here
 ```
 
 2. **Run with Docker Compose**

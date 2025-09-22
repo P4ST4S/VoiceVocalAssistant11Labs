@@ -17,7 +17,12 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
-  "keywords": ["voice", "assistant", "nestjs", "elevenlabs"],
+  "keywords": [
+    "voice",
+    "assistant",
+    "nestjs",
+    "elevenlabs"
+  ],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.17.0",
@@ -29,6 +34,8 @@
     "@nestjs/platform-express": "^11.1.6",
     "@nestjs/platform-socket.io": "^11.1.6",
     "axios": "^1.12.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "form-data": "^4.0.4",
     "multer": "^2.0.2",
     "reflect-metadata": "^0.2.2",
@@ -37,6 +44,7 @@
   "devDependencies": {
     "@nestjs/cli": "^11.0.10",
     "@nestjs/testing": "^11.1.6",
+    "@types/express": "^5.0.3",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.5.2",
     "ts-node": "^10.9.2",

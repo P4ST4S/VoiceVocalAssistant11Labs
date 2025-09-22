@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ElevenLabsApi } from '@elevenlabs/elevenlabs-js';
+import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 
 @Injectable()
 export class ElevenLabsService {
   private readonly logger = new Logger(ElevenLabsService.name);
-  private readonly elevenLabs: ElevenLabsApi;
+  private readonly elevenLabs: ElevenLabsClient;
 
   constructor(private configService: ConfigService) {
     const apiKey = this.configService.get<string>('ELEVENLABS_API_KEY');
@@ -13,7 +13,7 @@ export class ElevenLabsService {
       throw new Error('ELEVENLABS_API_KEY is required');
     }
     
-    this.elevenLabs = new ElevenLabsApi({
+    this.elevenLabs = new ElevenLabsClient({
       apiKey,
     });
   }
@@ -22,17 +22,16 @@ export class ElevenLabsService {
     try {
       this.logger.log('Converting speech to text');
       
-      const response = await this.elevenLabs.speechToSpeech.create({
-        voice_id: "pNInz6obpgDQGcFmaJgB", // Default voice ID
-        model_id: "eleven_english_sts_v2",
-        audio: audioBuffer,
-      });
-
-      // Note: ElevenLabs Speech-to-Speech returns audio, not text
-      // For actual STT, you might need to use a different service
-      // This is a placeholder implementation
-      this.logger.log('Speech to text conversion completed');
-      return "Transcribed text placeholder";
+      // Note: ElevenLabs primarily focuses on TTS, not STT
+      // This is a placeholder implementation that simulates transcription
+      // In a real implementation, you would use a dedicated STT service like:
+      // - OpenAI Whisper API
+      // - Google Speech-to-Text
+      // - Azure Speech Services
+      // - Amazon Transcribe
+      
+      this.logger.log('Speech to text conversion completed (placeholder)');
+      return "Hello, this is a placeholder transcription. Please integrate a real STT service.";
       
     } catch (error) {
       this.logger.error('Error in speech to text conversion', error);
@@ -44,20 +43,22 @@ export class ElevenLabsService {
     try {
       this.logger.log('Converting text to speech');
       
-      const audioStream = await this.elevenLabs.textToSpeech.convert({
-        voice_id: voiceId || "pNInz6obpgDQGcFmaJgB",
-        model_id: "eleven_multilingual_v2",
-        text,
-        voice_settings: {
-          stability: 0.1,
-          similarity_boost: 0.3,
-          style: 0.2,
-        },
-      });
+      const audioStream = await this.elevenLabs.textToSpeech.convert(
+        voiceId || "pNInz6obpgDQGcFmaJgB",
+        {
+          text,
+          modelId: "eleven_multilingual_v2",
+          voiceSettings: {
+            stability: 0.1,
+            similarityBoost: 0.3,
+            style: 0.2,
+          },
+        }
+      );
 
       const chunks: Buffer[] = [];
       for await (const chunk of audioStream) {
-        chunks.push(chunk);
+        chunks.push(Buffer.from(chunk));
       }
 
       const audioBuffer = Buffer.concat(chunks);
@@ -73,7 +74,7 @@ export class ElevenLabsService {
   async getVoices() {
     try {
       this.logger.log('Fetching available voices');
-      const voices = await this.elevenLabs.voices.getAll();
+      const voices = await this.elevenLabs.voices.search();
       return voices;
     } catch (error) {
       this.logger.error('Error fetching voices', error);

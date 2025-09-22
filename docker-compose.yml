@@ -1,0 +1,56 @@
+# Modern Docker Compose format (no version field needed in 2025)
+services:
+  backend:
+    build:
+      context: ./backend
+      target: development
+      dockerfile: Dockerfile
+    container_name: voice-assistant-backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+    volumes:
+      # Mount source code for hot reload in development
+      - ./backend/src:/usr/src/app/src:ro
+      - ./backend/package.json:/usr/src/app/package.json:ro
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - voice-assistant-network
+    depends_on: []
+
+  frontend:
+    build:
+      context: ./frontend
+      target: development
+      dockerfile: Dockerfile
+    container_name: voice-assistant-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:3001
+    volumes:
+      # Mount source code for hot reload in development
+      - ./frontend/src:/usr/src/app/src:ro
+      - ./frontend/public:/usr/src/app/public:ro
+      - ./frontend/index.html:/usr/src/app/index.html:ro
+      - ./frontend/vite.config.ts:/usr/src/app/vite.config.ts:ro
+    networks:
+      - voice-assistant-network
+    depends_on:
+      - backend
+
+networks:
+  voice-assistant-network:
+    driver: bridge
+    name: voice-assistant-network
